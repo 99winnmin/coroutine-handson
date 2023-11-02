@@ -7,10 +7,12 @@ import net.chandol.sample.coroutine.api.util.log
 
 // 동기식 코드도 비동기로 처리해보자
 fun main() = runBlocking {
-    val num1000 = calcWithSleep(1000)
-    val num2000 = calcWithSleep(2000)
+    // Dispatchers.IO 는 다른 스레드가 처리하도록 위임
+    // 코루틴도 보냄
+    val num1000 = async(Dispatchers.IO) { calcWithSleep(1000) }
+    val num2000 = async(Dispatchers.IO) { calcWithSleep(2000) }
 
-    val calc = num1000 + num2000
+    val calc = num1000.await() + num2000.await()
     log("$calc")
 }
 

@@ -11,9 +11,13 @@ import net.chandol.sample.coroutine.api.util.log
 // 배운걸 활용해서 비동기로 바꾸어보아요.
 fun main() = runBlocking {
     val result = IntRange(0, 10)
-        .map { blockingCalc(it) }
-        .map { nonBlockingCalc(it) }
-        .apply { this.forEachIndexed { idx, result -> complexLog("$idx = $result") } }
+        .map { async(Dispatchers.IO) {blockingCalc(it)} }
+//        .map { it.await()}
+        .awaitAll()// awaitAll() 로 해도됌
+        .map { async {nonBlockingCalc(it)} }
+//        .map { it.await() }
+        .awaitAll()
+        .apply { this.forEachIndexed { idx, result -> launch {complexLog("$idx = $result")} } }
         .sum()
 
     log("최종 결과!! $result")
